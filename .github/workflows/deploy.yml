@@ -41,3 +41,5 @@ jobs:
           context: .
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
+      - name: Debug
+        run: echo "USER=${{ secrets.DOCKERHUB_USERNAME }}"
