@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE: ousmane-dell/springg-maven
+  DOCKER_IMAGE: pamabel/springg-maven
 
 jobs:
 
