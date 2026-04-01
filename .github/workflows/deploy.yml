@@ -46,19 +46,14 @@ jobs:
           tags: ${{ env.DOCKER_IMAGE }}:latest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # ← pour utiliser Docker sur ton runner local
     needs: build-and-push
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            docker pull pamabel/springg-maven:latest
-            docker stop spring-app || true
-            docker rm spring-app || true
-            docker run -d -p 8080:8080 --name spring-app pamabel/springg-maven:latest
+      - name: Deploy locally
+        run: |
+          docker pull ${{ env.DOCKER_IMAGE }}:latest
+          docker stop spring-app || true
+          docker rm spring-app || true
+          docker run -d -p 8080:8080 --name spring-app ${{ env.DOCKER_IMAGE }}:latest
       
