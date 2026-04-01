@@ -85,18 +85,22 @@ jobs:
           echo "🚀 Lancement nouveau conteneur"
           docker run -d -p 8080:8080 --name spring-app ${{ env.DOCKER_IMAGE }}:latest
 
-          echo "⏳ Vérification..."
-          sleep 10
+          echo "⏳ Attente du démarrage de l'application..."
 
-          if ! curl -f http://localhost:8080; then
-            echo "❌ Deploy échoué → rollback"
-            docker stop spring-app
-            docker rm spring-app
-            docker run -d -p 8080:8080 --name spring-app ${{ env.DOCKER_IMAGE }}:previous
-            exit 1
-          fi
+          for i in {1..10}; do
+            if curl -f http://localhost:8080; then
+              echo "✅ Application prête"
+              exit 0
+            fi
+            echo "⏳ Tentative $i..."
+            sleep 5
+          done
 
-          echo "✅ Deploy réussi"
+          echo "❌ Deploy échoué → rollback"
+          docker stop spring-app
+          docker rm spring-app
+          docker run -d -p 8080:8080 --name spring-app ${{ env.DOCKER_IMAGE }}:previous
+          exit 1
 
   # -------------------------
   # NOTIFICATION
